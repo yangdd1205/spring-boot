@@ -28,6 +28,7 @@ import org.springframework.util.Assert;
 import org.springframework.validation.DefaultMessageCodesResolver;
 
 /**
+ * Spring mvc 配置类
  * {@link ConfigurationProperties properties} for Spring MVC.
  *
  * @author Phillip Webb

@@ -136,10 +136,14 @@ import org.springframework.web.util.UrlPathHelper;
  * @since 2.0.0
  */
 @Configuration(proxyBeanMethods = false)
+// 当前运行环境必须是 mvcweb（Servlet）环境
 @ConditionalOnWebApplication(type = Type.SERVLET)
+//当前运行环境的 classpath 中必须有 Servlet 类、DispatcherServlet 类、WebMvcConfigurer 类
 @ConditionalOnClass({ Servlet.class, DispatcherServlet.class, WebMvcConfigurer.class })
+// 如果没有自定义 WebMvc 的配置类，则使用本自动配置
 @ConditionalOnMissingBean(WebMvcConfigurationSupport.class)
 @AutoConfigureOrder(Ordered.HIGHEST_PRECEDENCE + 10)
+// 在 DispatcherServletAutoConfiguration、TaskExecutionAutoConfiguration、ValidationAutoConfiguration 后执行
 @AutoConfigureAfter({ DispatcherServletAutoConfiguration.class, TaskExecutionAutoConfiguration.class,
 		ValidationAutoConfiguration.class })
 public class WebMvcAutoConfiguration {
@@ -171,10 +175,16 @@ public class WebMvcAutoConfiguration {
 		return locations;
 	}
 
+
+	// 下面的类定义成为内部配置类的原因是，当该 WebMvcAutoConfiguration 在 classpath 读不到的时候，配置类也不能读到
+
 	// Defined as a nested config to ensure WebMvcConfigurer is not read when not
 	// on the classpath
+
 	@Configuration(proxyBeanMethods = false)
+	// 导入配置类
 	@Import(EnableWebMvcConfiguration.class)
+	// 启用WebMvcProperties、ResourceProperties
 	@EnableConfigurationProperties({ WebMvcProperties.class, ResourceProperties.class })
 	@Order(0)
 	public static class WebMvcAutoConfigurationAdapter implements WebMvcConfigurer {
@@ -255,6 +265,10 @@ public class WebMvcAutoConfiguration {
 			mediaTypes.forEach(configurer::mediaType);
 		}
 
+		/**
+		 * 默认是视图解析器
+		 * @return
+		 */
 		@Bean
 		@ConditionalOnMissingBean
 		public InternalResourceViewResolver defaultViewResolver() {
@@ -353,6 +367,8 @@ public class WebMvcAutoConfiguration {
 	}
 
 	/**
+	 * mvc 配置，使用 @EnableWebMvc 时
+	 *
 	 * Configuration equivalent to {@code @EnableWebMvc}.
 	 */
 	@Configuration(proxyBeanMethods = false)
@@ -377,6 +393,14 @@ public class WebMvcAutoConfiguration {
 			this.beanFactory = beanFactory;
 		}
 
+		/**
+		 *  处理适配器
+		 *
+		 * @param contentNegotiationManager
+		 * @param conversionService
+		 * @param validator
+		 * @return
+		 */
 		@Bean
 		@Override
 		public RequestMappingHandlerAdapter requestMappingHandlerAdapter(
@@ -398,6 +422,14 @@ public class WebMvcAutoConfiguration {
 			return super.createRequestMappingHandlerAdapter();
 		}
 
+		/**
+		 * 处理器映射器
+		 *
+		 * @param contentNegotiationManager
+		 * @param conversionService
+		 * @param resourceUrlProvider
+		 * @return
+		 */
 		@Bean
 		@Primary
 		@Override
@@ -410,6 +442,14 @@ public class WebMvcAutoConfiguration {
 					resourceUrlProvider);
 		}
 
+		/**
+		 * 主页的设置
+		 *
+		 * @param applicationContext
+		 * @param mvcConversionService
+		 * @param mvcResourceUrlProvider
+		 * @return
+		 */
 		@Bean
 		public WelcomePageHandlerMapping welcomePageHandlerMapping(ApplicationContext applicationContext,
 				FormattingConversionService mvcConversionService, ResourceUrlProvider mvcResourceUrlProvider) {
@@ -421,11 +461,13 @@ public class WebMvcAutoConfiguration {
 			return welcomePageHandlerMapping;
 		}
 
+		// 查找主页
 		private Optional<Resource> getWelcomePage() {
 			String[] locations = getResourceLocations(this.resourceProperties.getStaticLocations());
 			return Arrays.stream(locations).map(this::getIndexHtml).filter(this::isReadable).findFirst();
 		}
 
+		// 静态资源下面的 index.html
 		private Resource getIndexHtml(String location) {
 			return this.resourceLoader.getResource(location + "index.html");
 		}
@@ -439,6 +481,11 @@ public class WebMvcAutoConfiguration {
 			}
 		}
 
+		/**
+		 * 转换器
+		 *
+		 * @return
+		 */
 		@Bean
 		@Override
 		public FormattingConversionService mvcConversionService() {
@@ -449,6 +496,11 @@ public class WebMvcAutoConfiguration {
 			return conversionService;
 		}
 
+		/**
+		 * 校验器
+		 *
+		 * @return
+		 */
 		@Bean
 		@Override
 		public Validator mvcValidator() {
@@ -497,6 +549,10 @@ public class WebMvcAutoConfiguration {
 			}
 		}
 
+		/**
+		 * 内容协商管理
+		 * @return
+		 */
 		@Bean
 		@Override
 		public ContentNegotiationManager mvcContentNegotiationManager() {

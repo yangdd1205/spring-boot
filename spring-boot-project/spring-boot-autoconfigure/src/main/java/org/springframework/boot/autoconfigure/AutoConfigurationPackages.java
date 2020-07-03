@@ -91,12 +91,15 @@ public abstract class AutoConfigurationPackages {
 	 * @param packageNames the package names to set
 	 */
 	public static void register(BeanDefinitionRegistry registry, String... packageNames) {
+		// 判断 BeanFactory 是否包含 AutoConfigurationPackages
 		if (registry.containsBeanDefinition(BEAN)) {
 			BeanDefinition beanDefinition = registry.getBeanDefinition(BEAN);
 			ConstructorArgumentValues constructorArguments = beanDefinition.getConstructorArgumentValues();
+			// 添加构造参数
 			constructorArguments.addIndexedArgumentValue(0, addBasePackages(constructorArguments, packageNames));
 		}
 		else {
+			// 注册 BasePackages
 			GenericBeanDefinition beanDefinition = new GenericBeanDefinition();
 			beanDefinition.setBeanClass(BasePackages.class);
 			beanDefinition.getConstructorArgumentValues().addIndexedArgumentValue(0, packageNames);
@@ -114,6 +117,8 @@ public abstract class AutoConfigurationPackages {
 	}
 
 	/**
+	 * 保存配置类的根包路径
+	 *
 	 * {@link ImportBeanDefinitionRegistrar} to store the base package from the importing
 	 * configuration.
 	 */
@@ -179,6 +184,8 @@ public abstract class AutoConfigurationPackages {
 	}
 
 	/**
+	 * 用于保存根包路径的类
+	 *
 	 * Holder for the base package (name may be null to indicate no scanning).
 	 */
 	static final class BasePackages {

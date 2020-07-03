@@ -37,6 +37,8 @@ import org.springframework.core.annotation.AliasFor;
 import org.springframework.data.repository.Repository;
 
 /**
+ * SpringBootApplication 相当于 {@link Configuration} + {@link EnableAutoConfiguration} + {@link ComponentScan}
+ *
  * Indicates a {@link Configuration configuration} class that declares one or more
  * {@link Bean @Bean} methods and also triggers {@link EnableAutoConfiguration
  * auto-configuration} and {@link ComponentScan component scanning}. This is a convenience
@@ -53,7 +55,7 @@ import org.springframework.data.repository.Repository;
 @Documented
 @Inherited
 @SpringBootConfiguration
-@EnableAutoConfiguration
+@EnableAutoConfiguration // 自动装配的关键
 @ComponentScan(excludeFilters = { @Filter(type = FilterType.CUSTOM, classes = TypeExcludeFilter.class),
 		@Filter(type = FilterType.CUSTOM, classes = AutoConfigurationExcludeFilter.class) })
 public @interface SpringBootApplication {

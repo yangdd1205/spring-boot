@@ -79,7 +79,7 @@ import org.springframework.core.io.support.SpringFactoriesLoader;
 @Retention(RetentionPolicy.RUNTIME)
 @Documented
 @Inherited
-@AutoConfigurationPackage
+@AutoConfigurationPackage // 自动装配的包路径
 @Import(AutoConfigurationImportSelector.class)
 public @interface EnableAutoConfiguration {
 

@@ -45,6 +45,8 @@ import org.springframework.util.StringUtils;
 import org.springframework.util.unit.DataSize;
 
 /**
+ * web server 配置类，比如：端口、根目录
+ *
  * {@link ConfigurationProperties @ConfigurationProperties} for a web server (e.g. port
  * and path settings).
  *

@@ -56,6 +56,7 @@ import org.springframework.web.filter.ForwardedHeaderFilter;
  * @since 2.0.0
  */
 @Configuration(proxyBeanMethods = false)
+// 具有最高优先级执行
 @AutoConfigureOrder(Ordered.HIGHEST_PRECEDENCE)
 @ConditionalOnClass(ServletRequest.class)
 @ConditionalOnWebApplication(type = Type.SERVLET)
@@ -66,11 +67,22 @@ import org.springframework.web.filter.ForwardedHeaderFilter;
 		ServletWebServerFactoryConfiguration.EmbeddedUndertow.class })
 public class ServletWebServerFactoryAutoConfiguration {
 
+	/**
+	 * 创建一个 ServletWebServerFactoryCustomizer 定制器
+	 * @param serverProperties
+	 * @return
+	 */
 	@Bean
 	public ServletWebServerFactoryCustomizer servletWebServerFactoryCustomizer(ServerProperties serverProperties) {
 		return new ServletWebServerFactoryCustomizer(serverProperties);
 	}
 
+	/**
+	 * 当 org.apache.catalina.startup.Tomcat 类存在时
+	 * 创建 TomcatServletWebServerFactoryCustomizer 定制器
+	 * @param serverProperties
+	 * @return
+	 */
 	@Bean
 	@ConditionalOnClass(name = "org.apache.catalina.startup.Tomcat")
 	public TomcatServletWebServerFactoryCustomizer tomcatServletWebServerFactoryCustomizer(
@@ -110,8 +122,12 @@ public class ServletWebServerFactoryAutoConfiguration {
 			if (this.beanFactory == null) {
 				return;
 			}
+			// 编程式注入组件
+			// 注入 WebServerFactory Bean 的后置处理，将容器中所有 WebServerFactoryCustomizer 类型的 Bean
+			// 应用于 WebServerFactory
 			registerSyntheticBeanIfMissing(registry, "webServerFactoryCustomizerBeanPostProcessor",
 					WebServerFactoryCustomizerBeanPostProcessor.class);
+			// 注入 Bean的后置处理器，它将Bean工厂中的所有 ErrorPageRegistrars 应用于 ErrorPageRegistry 类型的Bean。
 			registerSyntheticBeanIfMissing(registry, "errorPageRegistrarBeanPostProcessor",
 					ErrorPageRegistrarBeanPostProcessor.class);
 		}

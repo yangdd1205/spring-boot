@@ -62,10 +62,12 @@ import org.springframework.web.servlet.DispatcherServlet;
  * @author Brian Clozel
  * @since 2.0.0
  */
+// 最高优先级执行
 @AutoConfigureOrder(Ordered.HIGHEST_PRECEDENCE)
 @Configuration(proxyBeanMethods = false)
 @ConditionalOnWebApplication(type = Type.SERVLET)
 @ConditionalOnClass(DispatcherServlet.class)
+// 在 ServletWebServerFactoryAutoConfiguration 之后，再执行
 @AutoConfigureAfter(ServletWebServerFactoryAutoConfiguration.class)
 public class DispatcherServletAutoConfiguration {
 
@@ -79,12 +81,15 @@ public class DispatcherServletAutoConfiguration {
 	 */
 	public static final String DEFAULT_DISPATCHER_SERVLET_REGISTRATION_BEAN_NAME = "dispatcherServletRegistration";
 
+	// 注册DispatcherServlet的配置类
 	@Configuration(proxyBeanMethods = false)
 	@Conditional(DefaultDispatcherServletCondition.class)
 	@ConditionalOnClass(ServletRegistration.class)
+	// 启用配置文件与Properties的映射
 	@EnableConfigurationProperties(WebMvcProperties.class)
 	protected static class DispatcherServletConfiguration {
 
+		// 创建 DispatcherServlet
 		@Bean(name = DEFAULT_DISPATCHER_SERVLET_BEAN_NAME)
 		public DispatcherServlet dispatcherServlet(WebMvcProperties webMvcProperties) {
 			DispatcherServlet dispatcherServlet = new DispatcherServlet();
@@ -96,6 +101,7 @@ public class DispatcherServletAutoConfiguration {
 			return dispatcherServlet;
 		}
 
+		// 注册文件上传组件
 		@Bean
 		@ConditionalOnBean(MultipartResolver.class)
 		@ConditionalOnMissingBean(name = DispatcherServlet.MULTIPART_RESOLVER_BEAN_NAME)
@@ -106,6 +112,9 @@ public class DispatcherServletAutoConfiguration {
 
 	}
 
+	/**
+	 * 注册 DispatcherServletRegistrationConfiguration
+	 */
 	@Configuration(proxyBeanMethods = false)
 	@Conditional(DispatcherServletRegistrationCondition.class)
 	@ConditionalOnClass(ServletRegistration.class)
@@ -113,6 +122,8 @@ public class DispatcherServletAutoConfiguration {
 	@Import(DispatcherServletConfiguration.class)
 	protected static class DispatcherServletRegistrationConfiguration {
 
+		// 辅助注册 DispatcherServlet的RegistrationBean
+		// 通过 DispatcherServletRegistrationBean 来注册 Servlet
 		@Bean(name = DEFAULT_DISPATCHER_SERVLET_REGISTRATION_BEAN_NAME)
 		@ConditionalOnBean(value = DispatcherServlet.class, name = DEFAULT_DISPATCHER_SERVLET_BEAN_NAME)
 		public DispatcherServletRegistrationBean dispatcherServletRegistration(DispatcherServlet dispatcherServlet,
