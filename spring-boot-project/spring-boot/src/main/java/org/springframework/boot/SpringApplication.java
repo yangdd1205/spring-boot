@@ -265,19 +265,34 @@ public class SpringApplication {
 	 */
 	@SuppressWarnings({ "unchecked", "rawtypes" })
 	public SpringApplication(ResourceLoader resourceLoader, Class<?>... primarySources) {
+		// resourceLoader is null
 		this.resourceLoader = resourceLoader;
 		Assert.notNull(primarySources, "PrimarySources must not be null");
+		// 将传入的启动类存入 primarySources 中，这样应用就知道主启动类在哪里
+		// 使用 LinkedHashSet 是为了保证顺序
 		this.primarySources = new LinkedHashSet<>(Arrays.asList(primarySources));
+		// 判断当前应用的类型
 		this.webApplicationType = WebApplicationType.deduceFromClasspath();
+		// 设置初始化器
 		setInitializers((Collection) getSpringFactoriesInstances(ApplicationContextInitializer.class));
+		// 设置监听器
 		setListeners((Collection) getSpringFactoriesInstances(ApplicationListener.class));
+		// 确定主配置类
 		this.mainApplicationClass = deduceMainApplicationClass();
 	}
 
+	/**
+	 * 推测主类。
+	 *
+	 * 疑问：不是已经传入 SpringApplication 了吗，为什么还要推测？
+	 * 因为：传入的配置类。我们一般把主类上打了 @SpringBootApplication 而已
+	 * @return
+	 */
 	private Class<?> deduceMainApplicationClass() {
 		try {
 			StackTraceElement[] stackTrace = new RuntimeException().getStackTrace();
 			for (StackTraceElement stackTraceElement : stackTrace) {
+				// 从本方法开始往上爬，哪一层调用栈上有main方法，方法对应的类就是主配置类
 				if ("main".equals(stackTraceElement.getMethodName())) {
 					return Class.forName(stackTraceElement.getClassName());
 				}
@@ -422,8 +437,10 @@ public class SpringApplication {
 
 	private <T> Collection<T> getSpringFactoriesInstances(Class<T> type, Class<?>[] parameterTypes, Object... args) {
 		ClassLoader classLoader = getClassLoader();
-		// Use names and ensure unique to protect against duplicates
+		// Use names and ensure unique to protect against duplicates 使用名称并确保唯一，以防止重复
+		// SpringFactoriesLoader.loadFactoryNames：加载指定类型的所有已配置组件的全限定类名
 		Set<String> names = new LinkedHashSet<>(SpringFactoriesLoader.loadFactoryNames(type, classLoader));
+		// 创建组件实例
 		List<T> instances = createSpringFactoriesInstances(type, parameterTypes, classLoader, args, names);
 		AnnotationAwareOrderComparator.sort(instances);
 		return instances;
@@ -435,6 +452,7 @@ public class SpringApplication {
 		List<T> instances = new ArrayList<>(names.size());
 		for (String name : names) {
 			try {
+				// 反射创建对象
 				Class<?> instanceClass = ClassUtils.forName(name, classLoader);
 				Assert.isAssignable(type, instanceClass);
 				Constructor<?> constructor = instanceClass.getDeclaredConstructor(parameterTypes);

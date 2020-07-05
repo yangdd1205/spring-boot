@@ -23,6 +23,7 @@ import org.springframework.context.event.ContextRefreshedEvent;
 import org.springframework.util.ReflectionUtils;
 
 /**
+ * 应用上下文加载完成后对缓存做清除工作
  * {@link ApplicationListener} to cleanup caches once the context is loaded.
  *
  * @author Phillip Webb

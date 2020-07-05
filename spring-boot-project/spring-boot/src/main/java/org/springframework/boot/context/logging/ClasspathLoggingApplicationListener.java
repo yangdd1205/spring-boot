@@ -30,6 +30,8 @@ import org.springframework.context.event.SmartApplicationListener;
 import org.springframework.core.ResolvableType;
 
 /**
+ * 对环境就绪事件 ApplicationEnvironmentPreparedEvent 和应用失败事件 ApplicationFailedEvent 做出响应
+ *
  * A {@link SmartApplicationListener} that reacts to
  * {@link ApplicationEnvironmentPreparedEvent environment prepared events} and to
  * {@link ApplicationFailedEvent failed events} by logging the classpath of the thread

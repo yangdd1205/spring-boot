@@ -26,6 +26,8 @@ import org.springframework.context.ApplicationListener;
 import org.springframework.util.ClassUtils;
 
 /**
+ * 使用一个可以和 SpringBoot 可执行jar包配合工作的版本替换 LiquibaseServiceLocator
+ *
  * {@link ApplicationListener} that replaces the liquibase {@link ServiceLocator} with a
  * version that works with Spring Boot executable archives.
  *

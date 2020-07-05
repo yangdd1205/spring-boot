@@ -34,6 +34,7 @@ import org.springframework.util.ClassUtils;
 import org.springframework.util.StringUtils;
 
 /**
+ * 监听到事件后转发给 application.properties 中配置的 context.listener.classes 的监听器
  * {@link ApplicationListener} that delegates to other listeners that are specified under
  * a {@literal context.listener.classes} environment property.
  *

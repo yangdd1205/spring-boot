@@ -57,6 +57,7 @@ import org.springframework.util.ResourceUtils;
 import org.springframework.util.StringUtils;
 
 /**
+ * 配置 LoggingSystem。使用 logging.config 环境变量指定的配置或者缺省配置
  * An {@link ApplicationListener} that configures the {@link LoggingSystem}. If the
  * environment contains a {@code logging.config} property it will be used to bootstrap the
  * logging system, otherwise a default configuration is used. Regardless, logging levels

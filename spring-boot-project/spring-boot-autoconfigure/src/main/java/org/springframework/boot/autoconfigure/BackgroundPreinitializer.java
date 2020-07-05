@@ -35,6 +35,7 @@ import org.springframework.http.converter.json.Jackson2ObjectMapperBuilder;
 import org.springframework.http.converter.support.AllEncompassingFormHttpMessageConverter;
 
 /**
+ * 使用一个后台线程尽早触发一些耗时的初始化任务
  * {@link ApplicationListener} to trigger early initialization in a background thread of
  * time consuming tasks.
  * <p>

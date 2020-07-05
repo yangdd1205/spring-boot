@@ -43,6 +43,7 @@ import org.springframework.util.ClassUtils;
 import org.springframework.util.StringUtils;
 
 /**
+ * 报告 Ioc 容器的一些常见的错误配置
  * {@link ApplicationContextInitializer} to report warnings for common misconfiguration
  * mistakes.
  *

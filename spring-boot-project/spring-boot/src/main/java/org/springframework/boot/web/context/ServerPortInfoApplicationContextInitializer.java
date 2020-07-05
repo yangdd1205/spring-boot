@@ -33,6 +33,7 @@ import org.springframework.core.env.PropertySource;
 import org.springframework.util.StringUtils;
 
 /**
+ * 将内置的 servlet 容器实际使用的监听端口写入到 Environment 环境属性中
  * {@link ApplicationContextInitializer} that sets {@link Environment} properties for the
  * ports that {@link WebServer} servers are actually listening on. The property
  * {@literal "local.server.port"} can be injected directly into tests using

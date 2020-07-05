@@ -34,6 +34,7 @@ import org.springframework.core.ResolvableType;
 import org.springframework.util.Assert;
 
 /**
+ * 将 ConditionEvaluationReport 写入日志
  * {@link ApplicationContextInitializer} that writes the {@link ConditionEvaluationReport}
  * to the log. Reports are logged at the {@link LogLevel#DEBUG DEBUG} level. A crash
  * report triggers an info output suggesting the user runs again with debug enabled to
