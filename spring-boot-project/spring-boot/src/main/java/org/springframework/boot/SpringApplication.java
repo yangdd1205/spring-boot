@@ -311,15 +311,22 @@ public class SpringApplication {
 	 * @return a running {@link ApplicationContext}
 	 */
 	public ConfigurableApplicationContext run(String... args) {
+		// 创建 StopWatch 对象
 		StopWatch stopWatch = new StopWatch();
 		stopWatch.start();
+		// 创建空的 Ioc 容器和一组异常报告器
 		ConfigurableApplicationContext context = null;
 		Collection<SpringBootExceptionReporter> exceptionReporters = new ArrayList<>();
+		// 配置与 awt 相关的信息
 		configureHeadlessProperty();
+		// 获取 SpringApplicationRunListeners，并调用 starting 方法（回调机制）
 		SpringApplicationRunListeners listeners = getRunListeners(args);
+		// 首次启动 run 方法时立刻调用。可用于非常早期的初始化（准备运行时环境之前）
 		listeners.starting();
 		try {
+			// 将 main 方法的 args 封装到一个对象中
 			ApplicationArguments applicationArguments = new DefaultApplicationArguments(args);
+			// 准备运行时环境
 			ConfigurableEnvironment environment = prepareEnvironment(listeners, applicationArguments);
 			configureIgnoreBeanInfo(environment);
 			Banner printedBanner = printBanner(environment);
@@ -354,10 +361,14 @@ public class SpringApplication {
 	private ConfigurableEnvironment prepareEnvironment(SpringApplicationRunListeners listeners,
 			ApplicationArguments applicationArguments) {
 		// Create and configure the environment
+		// 创建运行时环境
 		ConfigurableEnvironment environment = getOrCreateEnvironment();
+		// 配置运行时环境
 		configureEnvironment(environment, applicationArguments.getSourceArgs());
 		ConfigurationPropertySources.attach(environment);
+		// 回调 SpringApplicationRunListener#environmentPrepared （Environment构建完成，但在创建ApplicationContext之前）
 		listeners.environmentPrepared(environment);
+		// 环境与应用绑定
 		bindToSpringApplication(environment);
 		if (!this.isCustomEnvironment) {
 			environment = new EnvironmentConverter(getClassLoader()).convertEnvironmentIfNecessary(environment,
@@ -421,6 +432,7 @@ public class SpringApplication {
 	}
 
 	private void configureHeadlessProperty() {
+		// 检查显示器，没有的话也允许其继续启动
 		System.setProperty(SYSTEM_PROPERTY_JAVA_AWT_HEADLESS,
 				System.getProperty(SYSTEM_PROPERTY_JAVA_AWT_HEADLESS, Boolean.toString(this.headless)));
 	}
@@ -492,6 +504,7 @@ public class SpringApplication {
 	 * @see #configurePropertySources(ConfigurableEnvironment, String[])
 	 */
 	protected void configureEnvironment(ConfigurableEnvironment environment, String[] args) {
+		// 添加类型转换器
 		if (this.addConversionService) {
 			ConversionService conversionService = ApplicationConversionService.getSharedInstance();
 			environment.setConversionService((ConfigurableConversionService) conversionService);
@@ -551,6 +564,7 @@ public class SpringApplication {
 	}
 
 	/**
+	 * 绑定环境到 Spring 应用
 	 * Bind the environment to the {@link SpringApplication}.
 	 * @param environment the environment to bind
 	 */
