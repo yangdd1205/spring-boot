@@ -174,7 +174,9 @@ public class ServletWebServerApplicationContext extends GenericWebApplicationCon
 		WebServer webServer = this.webServer;
 		ServletContext servletContext = getServletContext();
 		if (webServer == null && servletContext == null) {
+			// 创建嵌入式 Servlet 容器的工厂
 			ServletWebServerFactory factory = getWebServerFactory();
+			// 创建嵌入式 Servlet 容器
 			this.webServer = factory.getWebServer(getSelfInitializer());
 			getBeanFactory().registerSingleton("webServerGracefulShutdown",
 					new WebServerGracefulShutdownLifecycle(this.webServer));

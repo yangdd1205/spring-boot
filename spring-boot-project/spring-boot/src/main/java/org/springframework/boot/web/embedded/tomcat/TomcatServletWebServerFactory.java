@@ -175,19 +175,27 @@ public class TomcatServletWebServerFactory extends AbstractServletWebServerFacto
 			Registry.disableRegistry();
 		}
 		Tomcat tomcat = new Tomcat();
+		// 给嵌入式 Tomcat 创建一个临时文件夹，用于存放 Tomcat 运行中需要的文件
 		File baseDir = (this.baseDirectory != null) ? this.baseDirectory : createTempDir("tomcat");
 		tomcat.setBaseDir(baseDir.getAbsolutePath());
+		// Tomcat核心概念：Connector，默认放入的protocol为NIO模式
 		Connector connector = new Connector(this.protocol);
 		connector.setThrowOnFailure(true);
+		// 给Service添加Connector
 		tomcat.getService().addConnector(connector);
+		// 执行定制器，修改即将设置到Tomcat中的Connector
 		customizeConnector(connector);
 		tomcat.setConnector(connector);
+		// 关闭热部署（嵌入式Tomcat不存在修改web.xml、war包等情况）
 		tomcat.getHost().setAutoDeploy(false);
+		// 设置backgroundProcessorDelay机制
 		configureEngine(tomcat.getEngine());
 		for (Connector additionalConnector : this.additionalTomcatConnectors) {
 			tomcat.getService().addConnector(additionalConnector);
 		}
+		// 生成TomcatEmbeddedContext
 		prepareContext(tomcat.getHost(), initializers);
+		// 创建TomcatWebServer
 		return getTomcatWebServer(tomcat);
 	}
 
@@ -200,18 +208,23 @@ public class TomcatServletWebServerFactory extends AbstractServletWebServerFacto
 
 	protected void prepareContext(Host host, ServletContextInitializer[] initializers) {
 		File documentRoot = getValidDocumentRoot();
+		// 创建TomcatEmbeddedContext
 		TomcatEmbeddedContext context = new TomcatEmbeddedContext();
 		if (documentRoot != null) {
 			context.setResources(new LoaderHidingResourceRoot(context));
 		}
+		// 设置contextPath，很熟悉了
 		context.setName(getContextPath());
 		context.setDisplayName(getDisplayName());
 		context.setPath(getContextPath());
+		// 给嵌入式Tomcat创建docbase的临时文件夹
 		File docBase = (documentRoot != null) ? documentRoot : createTempDir("tomcat-docbase");
 		context.setDocBase(docBase.getAbsolutePath());
+		// 注册监听器
 		context.addLifecycleListener(new FixContextListener());
 		context.setParentClassLoader((this.resourceLoader != null) ? this.resourceLoader.getClassLoader()
 				: ClassUtils.getDefaultClassLoader());
+		// 设置默认编码映射
 		resetDefaultLocaleMapping(context);
 		addLocaleMappings(context);
 		try {
@@ -221,17 +234,22 @@ public class TomcatServletWebServerFactory extends AbstractServletWebServerFacto
 			// Tomcat is < 8.5.39. Continue.
 		}
 		configureTldSkipPatterns(context);
+		// 自定义的类加载器，可以加载web应用的jar包
 		WebappLoader loader = new WebappLoader();
 		loader.setLoaderClass(TomcatEmbeddedWebappClassLoader.class.getName());
+		// 指定类加载器遵循双亲委派机制
 		loader.setDelegate(true);
 		context.setLoader(loader);
+		// 注册默认的Servlet
 		if (isRegisterDefaultServlet()) {
 			addDefaultServlet(context);
 		}
+		// 如果需要jsp支持，注册jsp的Servlet和Initializer
 		if (shouldRegisterJspServlet()) {
 			addJspServlet(context);
 			addJasperInitializer(context);
 		}
+		// 注册监听器
 		context.addLifecycleListener(new StaticResourceConfigurer(context));
 		ServletContextInitializer[] initializersToUse = mergeInitializers(initializers);
 		host.addChild(context);

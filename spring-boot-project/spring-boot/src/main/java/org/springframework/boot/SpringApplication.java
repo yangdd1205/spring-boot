@@ -334,18 +334,21 @@ public class SpringApplication {
 			Banner printedBanner = printBanner(environment);
 			// 创建 ApplicationContext
 			context = createApplicationContext();
-			// 初始化异常报告器
+			// 初始化异常报告器ServletWebServerApplicationContext
 			exceptionReporters = getSpringFactoriesInstances(SpringBootExceptionReporter.class,
 					new Class[] { ConfigurableApplicationContext.class }, context);
 			// 初始化 IoC 容器
 			prepareContext(context, environment, listeners, applicationArguments, printedBanner);
 			refreshContext(context);
+			// 刷新后的处理
 			afterRefresh(context, applicationArguments);
 			stopWatch.stop();
 			if (this.logStartupInfo) {
 				new StartupInfoLogger(this.mainApplicationClass).logStarted(getApplicationLog(), stopWatch);
 			}
+			// 发布 started 事件
 			listeners.started(context);
+			// 运行器回调
 			callRunners(context, applicationArguments);
 		}
 		catch (Throwable ex) {
@@ -434,10 +437,15 @@ public class SpringApplication {
 		listeners.contextLoaded(context);
 	}
 
+	/**
+	 * 刷新容器
+	 * @param context
+	 */
 	private void refreshContext(ConfigurableApplicationContext context) {
 		refresh((ApplicationContext) context);
 		if (this.registerShutdownHook) {
 			try {
+				// 注册一个钩子函数，当 JVM 关闭时，销毁 IoC 容器和里面的 Bean
 				context.registerShutdownHook();
 			}
 			catch (AccessControlException ex) {

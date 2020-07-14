@@ -291,7 +291,7 @@ public class WebMvcAutoConfiguration {
 		@ConditionalOnBean(ViewResolver.class)
 		@ConditionalOnMissingBean(name = "viewResolver", value = ContentNegotiatingViewResolver.class)
 		public ContentNegotiatingViewResolver viewResolver(BeanFactory beanFactory) {
-			ContentNegotiatingViewResolver resolver = new ContentNegotiatingViewResolver();
+			ContentNegotiatingViewResolver resolver = new ContentNegotiatingViewResolver();j
 			resolver.setContentNegotiationManager(beanFactory.getBean(ContentNegotiationManager.class));
 			// ContentNegotiatingViewResolver uses all the other view resolvers to locate
 			// a view so it should have a high precedence

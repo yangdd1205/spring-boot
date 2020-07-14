@@ -92,6 +92,7 @@ public abstract class SpringBootServletInitializer implements WebApplicationInit
 		// Logger initialization is deferred in case an ordered
 		// LogServletContextInitializer is being used
 		this.logger = LogFactory.getLog(getClass());
+		// 创建父容器
 		WebApplicationContext rootApplicationContext = createRootApplicationContext(servletContext);
 		if (rootApplicationContext != null) {
 			servletContext.addListener(new SpringBootContextLoaderListener(rootApplicationContext, servletContext));
@@ -125,6 +126,7 @@ public abstract class SpringBootServletInitializer implements WebApplicationInit
 	}
 
 	protected WebApplicationContext createRootApplicationContext(ServletContext servletContext) {
+		// 使用Builder机制，前面也介绍过
 		SpringApplicationBuilder builder = createSpringApplicationBuilder();
 		builder.main(getClass());
 		ApplicationContext parent = getExistingRootWebApplicationContext(servletContext);
@@ -133,10 +135,14 @@ public abstract class SpringBootServletInitializer implements WebApplicationInit
 			servletContext.setAttribute(WebApplicationContext.ROOT_WEB_APPLICATION_CONTEXT_ATTRIBUTE, null);
 			builder.initializers(new ParentContextApplicationContextInitializer(parent));
 		}
+		// 设置Initializer
 		builder.initializers(new ServletContextApplicationContextInitializer(servletContext));
+		// 在这里设置了容器启动类：AnnotationConfigServletWebServerApplicationContext
 		builder.contextClass(AnnotationConfigServletWebServerApplicationContext.class);
+		// 多态进入子类（自己定义）的方法中
 		builder = configure(builder);
 		builder.listeners(new WebEnvironmentPropertySourceInitializer(servletContext));
+		// builder.build()，创建SpringApplication
 		SpringApplication application = builder.build();
 		if (application.getAllSources().isEmpty()
 				&& MergedAnnotations.from(getClass(), SearchStrategy.TYPE_HIERARCHY).isPresent(Configuration.class)) {
@@ -150,6 +156,7 @@ public abstract class SpringBootServletInitializer implements WebApplicationInit
 			application.addPrimarySources(Collections.singleton(ErrorPageFilterConfiguration.class));
 		}
 		application.setRegisterShutdownHook(false);
+		// 启动SpringBoot应用
 		return run(application);
 	}
 
