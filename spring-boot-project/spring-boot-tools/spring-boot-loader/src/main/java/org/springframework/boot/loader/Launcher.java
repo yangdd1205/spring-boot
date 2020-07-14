@@ -50,11 +50,14 @@ public abstract class Launcher {
 	 */
 	protected void launch(String[] args) throws Exception {
 		if (!isExploded()) {
+			// 注册 URL 协议
 			JarFile.registerUrlProtocolHandler();
 		}
+		// 创建类加载器
 		ClassLoader classLoader = createClassLoader(getClassPathArchivesIterator());
 		String jarMode = System.getProperty("jarmode");
 		String launchClass = (jarMode != null && !jarMode.isEmpty()) ? JAR_MODE_LAUNCHER : getMainClass();
+		// 执行 main 方法
 		launch(args, launchClass, classLoader);
 	}
 

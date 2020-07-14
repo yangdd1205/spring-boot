@@ -446,6 +446,7 @@ public class JarFile extends java.util.jar.JarFile implements Iterable<java.util
 	}
 
 	/**
+	 * 注册一个 java.protocol.handler.pkgs 属性，用于设置 URLStreamHandler 实现类的包路径
 	 * Register a {@literal 'java.protocol.handler.pkgs'} property so that a
 	 * {@link URLStreamHandler} will be located to deal with jar URLs.
 	 */
@@ -457,6 +458,8 @@ public class JarFile extends java.util.jar.JarFile implements Iterable<java.util
 	}
 
 	/**
+	 * 重置任何缓存的处理程序，以防万一已经使用了jar协议。
+	 * 我们通过尝试设置null URLStreamHandlerFactory来重置处理程序，除了清除处理程序缓存之外，它应该没有任何效果。
 	 * Reset any cached handlers just in case a jar protocol has already been used. We
 	 * reset the handler by trying to set a null {@link URLStreamHandlerFactory} which
 	 * should have no effect other than clearing the handlers cache.
